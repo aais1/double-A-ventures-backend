@@ -26,7 +26,7 @@ const getProductsController = async(req, res) => {
     const [results] = await connection.promise()
     .query(`Select * From products `
     );
-    res.status(200).json(results[0]);
+    res.status(200).json(results);
     } catch (error) {
         res.json({message:error.message})
     }
