@@ -7,6 +7,7 @@ router.get('/',getProductsController);
 router.get('/:id',getProductController);
 router.put('/:id',updateProductController);
 router.delete('/:id',deleteProductController);
+
 router.use('/:id/review',reviewRouter)
 
 
