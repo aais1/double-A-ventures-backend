@@ -1,7 +1,30 @@
 const { connection } = require("../db/db");
 
 const getAllOrders = async (req, res) => {
-  res.json({ data: "all orders" });
+  try {
+    const [result] = await connection.promise().query(`
+      SELECT 
+    o.orderId AS orderId,
+    o.createdAt AS orderCreatedAt,
+    o.approved AS orderStatus,
+    o.address AS orderAddress,
+    o.quantity AS orderQuantity,
+    u.id AS id,
+    u.email AS email,
+    p.id AS productId,
+    p.name AS productName,
+    p.price AS productPrice
+FROM 
+    orders o
+JOIN 
+    users u ON o.userId = u.id
+JOIN 
+    products p ON o.productId = p.id;
+    `);
+    res.json(result);
+  } catch (e) {
+    res.json({ error: e.message });
+  }
 };
 
 const getOrderById = async (req, res) => {
@@ -18,8 +41,8 @@ const createOrder = async (req, res) => {
       const [result] = await connection
         .promise()
         .query(
-          "INSERT INTO orders (userId, productId, address, approved) VALUES (?, ?, ?, ?)",
-          [userId, productId, address, approveStatus]
+          "INSERT INTO orders (userId, productId, address,quantity, approved) VALUES (?, ?,?,?, ?)",
+          [userId, productId,address,quantity, approveStatus]
         );
       return result.insertId; // Return the inserted order ID
     });

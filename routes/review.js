@@ -1,8 +1,8 @@
 const router=require('express').Router();
 const {getReviews,postReview} = require('../controllers/review')
 
-router.get('/',getReviews)
+router.get('/:id',getReviews)
 
-router.post('/',postReview)
+router.post('/:id',postReview)
 
 module.exports=router

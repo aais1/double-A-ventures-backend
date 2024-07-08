@@ -19,11 +19,10 @@ const postReview = async (req,res)=>{
 
 const getReviews = async (req,res)=>{
     const id=req.params.id;
-    console.log(id)
     try{
         const [result]=await connection.promise().query('SELECT * FROM review WHERE ProductId=?',[id]);
         console.log(result)
-        res.json({result})
+        res.json(result)
     }catch(e){
         res.json({error:e.message});
     }
