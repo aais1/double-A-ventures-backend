@@ -56,7 +56,27 @@ const createOrder = async (req, res) => {
 };
 
 const deleteOrderById = async (req, res) => {
-  res.json({ data: "delete" + req.params.id });
+  let orderId = req.params.id;
+  let [result] = await connection.promise().query(
+    "DELETE FROM orders WHERE orderId = ?",
+    [orderId]
+  );
+  res.json({ message: "Order deleted", data: result });
+};
+
+
+const approveOrder = async (req, res) => {
+  let id = req.params.id;
+  try {
+    let [result]=await connection.promise().query(
+      'UPDATE orders SET approved = true WHERE orderId = ?',[id]
+    )
+    res.json({message:"Order confirmed"})
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({message:"Something went wrong"})
+  }
+
 };
 
 module.exports = {
@@ -64,4 +84,5 @@ module.exports = {
   getOrderById,
   createOrder,
   deleteOrderById,
+  approveOrder
 };
