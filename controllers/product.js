@@ -113,6 +113,19 @@ const updateProductController = async(req, res) => {
 
 };
 
+async function deleteReviews(id){
+    try {
+        const [result]=await connection.promise().query(
+            `DELETE FROM reviews WHERE productId = ?`,
+            [id]
+        );
+        return result;
+    } catch (error) {
+        console.log(error.messages)
+    }
+
+}
+
 // Delete a product by ID
 const deleteProductController = async (req, res) => {
     const productId = req.params.id;
@@ -120,6 +133,9 @@ const deleteProductController = async (req, res) => {
     try {
         // Delete images associated with the product
         await deleteImages(productId);
+
+        // Delete reviews associated with the product
+        await deleteReviews(productId);
 
         // Delete the product itself
         const [result] = await connection.promise().query(
