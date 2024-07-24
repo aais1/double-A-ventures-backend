@@ -49,6 +49,7 @@ const uploadImages = async (images, productId) => {
 
 // Get all products
 const getProductsController = async (req, res) => {
+  console.log('al')
   try {
     // Fetch all products with their associated image URLs aggregated into an array
     const [results] = await connection.promise().query(
@@ -76,8 +77,51 @@ const getProductsController = async (req, res) => {
   }
 };
 
+const getProductByCategoryController = async (req, res) => {
+  const category = req.params.type;
+
+  if (!category) {
+    return res.status(400).json({ message: 'Category type is required' });
+  }
+
+  try {
+    const [results] = await connection.promise().query(
+      `SELECT p.*, GROUP_CONCAT(i.url) AS imageUrls
+       FROM Products p
+       JOIN categories c ON p.categoryId = c.id
+       LEFT JOIN images i ON p.id = i.productId
+       WHERE c.name = ?
+       GROUP BY p.id`,
+      [category]
+    );
+
+    const formattedResults = results.map((product) => ({
+      ...product,
+      images: product.imageUrls ? product.imageUrls.split(",") : [],
+    }));
+
+    if(formattedResults.length === 0) {
+      res.status(200).json({
+        message:'No Products found in this category'
+      });
+      return;
+    }
+
+    formattedResults.forEach((product) => delete product.imageUrls);
+
+    res.status(200).json(formattedResults);
+  } catch (error) {
+    console.error("Error fetching products:", error.message);
+    res.status(500).json({ message: "Error fetching products", error: error.message });
+  }
+};
+
+
+
+
 // Get a single product by ID
 const getProductController = async (req, res) => {
+  console.log('single')
   try {
     const productId = req.params.id;
     const [results] = await connection.promise().query(
@@ -168,10 +212,14 @@ const deleteProductController = async (req, res) => {
   
 };
 
+
+
+
 module.exports = {
   newProductController,
   getProductsController,
   getProductController,
   updateProductController,
   deleteProductController,
+  getProductByCategoryController
 };
