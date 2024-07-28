@@ -1,5 +1,6 @@
 const { connection } = require("../db/db");
 
+//login
 const loginController = async (req, res) => {
   const { email, password } = req.body;
   try {
